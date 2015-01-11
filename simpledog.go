@@ -9,12 +9,14 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
+	// "path/filepath"
+	"syscall"
 )
 
+const appname string = "simpledog"
+
 func usage() {
-	selfname := filepath.Base(os.Args[0])
-	fmt.Printf("Usage: simpledog <process to start>\n", selfname)
+	fmt.Printf("Usage: %s <process to start>\n", appname)
 }
 
 func main() {
@@ -23,22 +25,28 @@ func main() {
 		os.Exit(1)
 	}
 
-	argsWithoutProg := os.Args[1:]
-	log.Printf("simpledog starting: %s\n", argsWithoutProg)
+	args := os.Args[1:]
+	log.Printf("%s starting: %s\n", appname, args)
 
-	subName := argsWithoutProg[0]
-	subArgs := argsWithoutProg[1:]
-	cmd := exec.Command(subName, subArgs...)
-	err := cmd.Start()
-	if err != nil {
+	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Waiting for command to finish...")
-	err = cmd.Wait()
-	log.Printf("Command finished with error: %v", err)
-
-	// TODO(kangas) does not pass through stdout/stderr from cmd
-	// TODO(kangas) does correctly return error code
+	if err := cmd.Wait(); err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+	        // The program has exited with an exit code != 0
+            // There is no platform independent way to retrieve
+			// the exit code, but the following will work on Unix
+            if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+                os.Exit(status.ExitStatus())
+            } else {
+            	log.Fatal(err)
+            }
+		}
+	}
 }
 
 /*
