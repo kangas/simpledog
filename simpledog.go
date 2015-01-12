@@ -1,17 +1,22 @@
 /*
-A simple process watchdog
-Usage: simpledog <process to start with arguments>
+A simple process watchdog.
+Spawns arguments as a subprocess.
+Terminates subprocess when orphaned by parent.
+
+Implemented with Go 1.4
+
+Author: Matt Kangas <kangas@gmail.com>
+Date: January 2015
 */
 package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
-	// "path/filepath"
 	"syscall"
-	"time"
 )
 
 const appname string = "simpledog"
@@ -21,14 +26,22 @@ func usage() {
 }
 
 func killIfOrphaned(cmd *exec.Cmd) {
-	for i := 0; i < 10; i++ {
-		fmt.Println("=====", i)
-		time.Sleep(time.Second)
+	buf := make([]byte, 1024)
+	for {
+		_, err := os.Stdin.Read(buf)
+		if err != nil {
+			if err == io.EOF {
+				fmt.Println(appname, "detected EOF on stdin")
+				break;
+			}
+			fmt.Println(err)
+		}
 	}
-	fmt.Println("===== BOOM =====")
+
+	fmt.Println(appname, "killing cmd", cmd.Path)
 	err := cmd.Process.Kill()
 	if err != nil {
-		log.Println("======", err)
+		log.Println(appname, "failed to kill", err)
 	}
 }
 
