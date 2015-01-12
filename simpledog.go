@@ -11,12 +11,25 @@ import (
 	"os/exec"
 	// "path/filepath"
 	"syscall"
+	"time"
 )
 
 const appname string = "simpledog"
 
 func usage() {
 	fmt.Printf("Usage: %s <process to start>\n", appname)
+}
+
+func killIfOrphaned(cmd *exec.Cmd) {
+	for i := 0; i < 10; i++ {
+		fmt.Println("=====", i)
+		time.Sleep(time.Second)
+	}
+	fmt.Println("===== BOOM =====")
+	err := cmd.Process.Kill()
+	if err != nil {
+		log.Println("======", err)
+	}
 }
 
 func main() {
@@ -31,6 +44,8 @@ func main() {
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
+	go killIfOrphaned(cmd)
 
 	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
