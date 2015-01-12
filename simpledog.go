@@ -31,17 +31,17 @@ func killIfOrphaned(cmd *exec.Cmd) {
 		_, err := os.Stdin.Read(buf)
 		if err != nil {
 			if err == io.EOF {
-				fmt.Println(appname, "detected EOF on stdin")
+				log.Println("detected EOF on stdin")
 				break
 			}
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 
-	fmt.Println(appname, "killing cmd", cmd.Path)
+	log.Println("killing", cmd.Path)
 	err := cmd.Process.Kill()
 	if err != nil {
-		log.Println(appname, "failed to kill", err)
+		log.Println("failed to kill", err)
 	}
 }
 
@@ -51,8 +51,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	log.SetFlags(0)
+	log.SetPrefix(appname +" ")
+
 	args := os.Args[1:]
-	log.Printf("%s starting: %s\n", appname, args)
+	log.Printf("starting: %s\n", args)
 
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stdout = os.Stdout
