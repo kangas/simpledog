@@ -61,11 +61,12 @@ func main() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	go killIfOrphaned(cmd)
-
 	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
 	}
+
+	go killIfOrphaned(cmd)
+
 	if err := cmd.Wait(); err != nil {
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			// The program has exited with an exit code != 0
