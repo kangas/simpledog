@@ -32,7 +32,7 @@ func killIfOrphaned(cmd *exec.Cmd) {
 		if err != nil {
 			if err == io.EOF {
 				fmt.Println(appname, "detected EOF on stdin")
-				break;
+				break
 			}
 			fmt.Println(err)
 		}
@@ -46,7 +46,7 @@ func killIfOrphaned(cmd *exec.Cmd) {
 }
 
 func main() {
-	if (len(os.Args) == 1) {
+	if len(os.Args) == 1 {
 		usage()
 		os.Exit(1)
 	}
@@ -65,14 +65,14 @@ func main() {
 	}
 	if err := cmd.Wait(); err != nil {
 		if exiterr, ok := err.(*exec.ExitError); ok {
-	        // The program has exited with an exit code != 0
-            // There is no platform independent way to retrieve
+			// The program has exited with an exit code != 0
+			// There is no platform independent way to retrieve
 			// the exit code, but the following will work on Unix
-            if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-                os.Exit(status.ExitStatus())
-            } else {
-            	log.Fatal(err)
-            }
+			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+				os.Exit(status.ExitStatus())
+			} else {
+				log.Fatal(err)
+			}
 		}
 	}
 }
