@@ -34,7 +34,7 @@ func killIfOrphaned(cmd *exec.Cmd) {
 				log.Println("detected EOF on stdin")
 				break
 			}
-			log.Println(err)
+			log.Printf("error reading from stdin: %v\n", err)
 		}
 	}
 
@@ -75,7 +75,7 @@ func main() {
 			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 				os.Exit(status.ExitStatus())
 			} else {
-				log.Fatal(err)
+				log.Fatalf("error getting subprocess exit status", err)
 			}
 		}
 	}
