@@ -8,5 +8,8 @@ A simple process watchdog. Ensures child process won't outlive parent.
 
 Implemented with Go 1.4
 
-Author: Matt Kangas <kangas@gmail.com>
 Date: January 2015
+
+## Authors
+
+- Matt Kangas <kangas@gmail.com>
